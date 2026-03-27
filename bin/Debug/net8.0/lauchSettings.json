@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "EngenhariasSenac": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:7034;http://localhost:7035",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
