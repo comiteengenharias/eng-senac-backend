@@ -127,6 +127,9 @@ public class LoginController : ControllerBase
             var role = principal.FindFirst(ClaimTypes.Role)?.Value;
             var userId = principal.FindFirst("UserId")?.Value;
 
+            if (email == null && (role == "student" || role == "teacher"))
+                return Results.Unauthorized();
+
             return Results.Ok(new
             {
                 loggedIn = true,

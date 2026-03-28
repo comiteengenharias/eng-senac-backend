@@ -9414,11 +9414,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\rafae\\Downloads\\eng-senac-backend\\EngenhariasSenac.csproj",
+      "projectUniqueName": "C:\\Users\\rafae\\OneDrive\\Documentos\\Senac\\Comite\\Repos\\Backend\\EngenhariasSenac.csproj",
       "projectName": "EngenhariasSenac",
-      "projectPath": "C:\\Users\\rafae\\Downloads\\eng-senac-backend\\EngenhariasSenac.csproj",
+      "projectPath": "C:\\Users\\rafae\\OneDrive\\Documentos\\Senac\\Comite\\Repos\\Backend\\EngenhariasSenac.csproj",
       "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\rafae\\Downloads\\eng-senac-backend\\obj\\",
+      "outputPath": "C:\\Users\\rafae\\OneDrive\\Documentos\\Senac\\Comite\\Repos\\Backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config"
