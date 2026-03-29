@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EngenhariasSenac")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+44dc3153bf8d6ee0353b94d46b0f778fb624cf14")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+78e2880c6330dd920443679bc41c6e44566d5fba")]
 [assembly: System.Reflection.AssemblyProductAttribute("EngenhariasSenac")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EngenhariasSenac")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
