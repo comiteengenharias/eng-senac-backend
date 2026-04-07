@@ -3,3 +3,7 @@
 
 # env files
 .env*
+
+# Build
+bin/
+obj/
