@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\rafae\\Downloads\\eng-senac-backend\\EngenhariasSenac.csproj": {}
+    "D:\\Comite das Enguearias\\Projetos\\eng-senac-backend\\EngenhariasSenac.csproj": {}
   },
   "projects": {
-    "C:\\Users\\rafae\\Downloads\\eng-senac-backend\\EngenhariasSenac.csproj": {
+    "D:\\Comite das Enguearias\\Projetos\\eng-senac-backend\\EngenhariasSenac.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rafae\\Downloads\\eng-senac-backend\\EngenhariasSenac.csproj",
+        "projectUniqueName": "D:\\Comite das Enguearias\\Projetos\\eng-senac-backend\\EngenhariasSenac.csproj",
         "projectName": "EngenhariasSenac",
-        "projectPath": "C:\\Users\\rafae\\Downloads\\eng-senac-backend\\EngenhariasSenac.csproj",
-        "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rafae\\Downloads\\eng-senac-backend\\obj\\",
+        "projectPath": "D:\\Comite das Enguearias\\Projetos\\eng-senac-backend\\EngenhariasSenac.csproj",
+        "packagesPath": "C:\\Users\\pedra\\.nuget\\packages\\",
+        "outputPath": "D:\\Comite das Enguearias\\Projetos\\eng-senac-backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\pedra\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -74,15 +74,7 @@
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
-              "version": "[6.5.0, )"
-            },
-            "Swashbuckle.AspNetCore.Swagger": {
-              "target": "Package",
-              "version": "[6.5.0, )"
-            },
-            "Swashbuckle.AspNetCore.SwaggerUI": {
-              "target": "Package",
-              "version": "[6.5.0, )"
+              "version": "[10.1.7, )"
             }
           },
           "imports": [
@@ -96,6 +88,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.26, 8.0.26]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.26, 8.0.26]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.26, 8.0.26]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.26, 8.0.26]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -104,7 +114,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

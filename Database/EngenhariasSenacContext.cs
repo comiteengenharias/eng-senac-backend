@@ -20,6 +20,9 @@ namespace EngenhariasSenac.Database
         public DbSet<ProjectAttachment> ProjectAttachment { get; set; }
         public DbSet<Committee> Committee { get; set; }
         public DbSet<ExtraPoint> ExtraPoints { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Auth> Auths { get; set; }
+        public DbSet<AuthRecovery> AuthRecoverys { get; set; }
 
         private readonly string? connectionString;
 

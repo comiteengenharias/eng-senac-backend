@@ -7,6 +7,9 @@ using DotNetEnv;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.HttpOverrides;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Reflection;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,7 +73,22 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("robotica", new() { Title = "Robótica - API", Version = "v1.0.0", Description = "API de autenticação e gerenciamento para Robótica" });
+    c.SwaggerDoc("semana", new() { Title = "Semana das Engenharias - API", Version = "v1.0.0", Description = "API de gerenciamento para a Semana das Engenharias" });
+    c.DocInclusionPredicate((docName, apiDesc) =>
+    {
+        if (docName == "robotica")
+            return apiDesc.RelativePath?.StartsWith("api/robotica") == true;
+        return apiDesc.RelativePath?.StartsWith("api/robotica") != true;
+    });
+
+    // Include XML comments
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath)) c.IncludeXmlComments(xmlPath);
+});
 
 // ignora ciclos de referência ao serializar JSON
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
@@ -108,9 +126,16 @@ app.AddStudentEndpoints();
 app.AddTeacherEndpoints();
 app.AddSupportEndpoints();
 app.AddGeneralEndpoints();
+app.AddRoboticaLoginEndpoints();
+app.AddRoboticaEndpoints();
 
 // swagger
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/robotica/swagger.json", "Robótica - API");
+    c.SwaggerEndpoint("/swagger/semana/swagger.json", "Semana das Engenharias");
+    c.RoutePrefix = "swagger";
+});
 
 app.Run();

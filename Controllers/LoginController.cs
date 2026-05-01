@@ -4,6 +4,7 @@ using EngenhariasSenac.Database;
 using EngenhariasSenac.Helpers;
 using EngenhariasSenac.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using static EngenhariasSenac.Endpoints.LoginEndpoints;
 
@@ -12,7 +13,17 @@ namespace EngenhariasSenac.Controllers;
 
 public class LoginController : ControllerBase
 {
+    /// <summary>
+    /// Realiza o login de estudante e define o cookie JWT na resposta.
+    /// </summary>
+    /// <param name="data">Objeto com `Email` e `Password`.</param>
+    /// <param name="response">Objeto HttpResponse para anexar cookie JWT.</param>
+    /// <returns>Mensagem de sucesso ou erro de credenciais.</returns>
     [HttpGet("/api/login/student")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public static IResult PostStudentLogin([FromBody] StudentLoginDto data, HttpResponse response)
     {
         var context = new EngenhariasSenacContext();
@@ -45,7 +56,17 @@ public class LoginController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Realiza o login de professor e define o cookie JWT na resposta.
+    /// </summary>
+    /// <param name="data">Objeto com `Email` e `Password`.</param>
+    /// <param name="response">Objeto HttpResponse para anexar cookie JWT.</param>
+    /// <returns>Mensagem de sucesso ou erro de credenciais.</returns>
     [HttpGet("/api/login/teacher")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public static IResult PostTeacherLogin([FromBody] TeacherLoginDto data, HttpResponse response)
     {
         try
@@ -81,7 +102,16 @@ public class LoginController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Realiza o login do suporte (usuário fixo) e define o cookie JWT.
+    /// </summary>
+    /// <param name="data">Objeto com `Password` de acesso ao suporte.</param>
+    /// <param name="response">Objeto HttpResponse para anexar cookie JWT.</param>
+    /// <returns>Mensagem de sucesso ou erro de credenciais.</returns>
     [HttpGet("/api/login/support")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public static IResult PostSupportLogin([FromBody] SupportLoginDto data, HttpResponse response)
     {
         try
@@ -110,7 +140,15 @@ public class LoginController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Verifica se o usuário está autenticado (lê cookie JWT).
+    /// </summary>
+    /// <param name="request">Objeto HttpRequest para ler cookie JWT.</param>
+    /// <returns>Informações de autenticação (loggedIn, role, email, userId) ou 401.</returns>
     [HttpGet("/api/verify-login")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public static IResult PostVerifyLogin(HttpRequest request)
     {
         try
@@ -144,7 +182,14 @@ public class LoginController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Realiza logout removendo o cookie JWT.
+    /// </summary>
+    /// <param name="response">Objeto HttpResponse para limpar cookie.</param>
+    /// <returns>Mensagem de sucesso.</returns>
     [HttpPost("/api/logout")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult PostLogout(HttpResponse response)
     {
         response.Cookies.Append("jwt", "", new CookieOptions
@@ -158,7 +203,15 @@ public class LoginController : ControllerBase
         return Results.Ok("Logout realizado com sucesso");
     }
 
+    /// <summary>
+    /// Recupera a senha do professor, gera nova senha e envia por e-mail.
+    /// </summary>
+    /// <param name="institutionalEmail">E-mail institucional do professor.</param>
+    /// <returns>Mensagem de envio ou erro.</returns>
     [HttpPost("/api/recover-password/teacher")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public static IResult RecoverTeacherPassword([FromBody] string institutionalEmail)
     {
         try
@@ -194,7 +247,15 @@ public class LoginController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Recupera a senha do estudante, gera nova senha e envia por e-mail.
+    /// </summary>
+    /// <param name="institutionalEmail">E-mail institucional do estudante.</param>
+    /// <returns>Mensagem de envio ou erro.</returns>
     [HttpPost("/api/recover-password/student")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public static IResult RecoverStudentPassword([FromBody] string institutionalEmail)
     {
         try

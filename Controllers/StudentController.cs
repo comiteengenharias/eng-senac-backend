@@ -4,6 +4,7 @@ using EngenhariasSenac.Helpers;
 using EngenhariasSenac.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using EngenhariasSenac.Dtos;
 using EngenhariasSenac.Migrations;
 
@@ -36,7 +37,15 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna os dados do estudante autenticado e cálculo de ponto extra.
+    /// </summary>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Objeto com dados do estudante, extraNote e extraNoteReason.</returns>
     [HttpGet("/api/student/info")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public static IResult GetMyStudentData(HttpContext http)
     {
         try
@@ -162,7 +171,17 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Altera a senha do estudante autenticado.
+    /// </summary>
+    /// <param name="data">Objeto com `CurrentPsw` e `NewPsw`.</param>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Mensagem de sucesso ou erro.</returns>
     [HttpGet("/api/student/change-password")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public static IResult PostChangePassword([FromBody] ChangePasswordDto data, HttpContext http)
     {
         try
@@ -192,7 +211,15 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna resumo do projeto do estudante (membros, avaliações e metas).
+    /// </summary>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Objeto com informações resumidas do projeto.</returns>
     [HttpGet("/api/student/project-info")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public static IResult GetMySummaryData(HttpContext http)
     {
         try
@@ -259,7 +286,15 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna os dados completos do projeto do estudante.
+    /// </summary>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Objeto com projeto, membros, ratings e flags.</returns>
     [HttpGet("/api/student/project-info")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public static IResult GetMyProjectData(HttpContext http)
     {
         try
@@ -313,7 +348,14 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna as palestras e presença do estudante com intervalos e porcentagens.
+    /// </summary>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Lista de palestras com presença detalhada.</returns>
     [HttpGet("/api/student/lectures")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult GetLecturesData(HttpContext http)
     {
         try
@@ -397,7 +439,14 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Lista empresas disponíveis para avaliação pelo estudante.
+    /// </summary>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Lista de empresas e flag canEvaluate.</returns>
     [HttpGet("/api/student/business")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult GetBusinessData(HttpContext http)
     {
         try
@@ -434,7 +483,15 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Envia avaliação de empresa com imagem e comentário.
+    /// </summary>
+    /// <param name="http">HttpContext com token de autenticação e form-data com companyId, assessment, comment e file.</param>
+    /// <returns>Mensagem de sucesso ou erro.</returns>
     [Authorize(Roles = "Student")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public static async Task<IResult> PostBusinessAssessment(HttpContext http)
     {
         try
@@ -503,8 +560,16 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Lista outros projetos disponíveis para avaliação pelo estudante.
+    /// </summary>
+    /// <param name="filterDto">Filtro opcional por semestre e nome do grupo.</param>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Lista de projetos com flags CanEvaluate e AlreadyEvaluated.</returns>
     [Authorize(Roles = "Student")]
     [HttpPost("/api/student/other-projects")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult GetOtherProjectsData([FromBody] ProjectsFilterDto? filterDto, HttpContext http)
     {
         try
@@ -556,7 +621,15 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Envia avaliação de outro projeto com imagem e comentário.
+    /// </summary>
+    /// <param name="http">HttpContext com form-data contendo projectId, assessment, comment e file.</param>
+    /// <returns>Mensagem de sucesso ou erro.</returns>
     [Authorize(Roles = "Student")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public static async Task<IResult> PostEvaluateOtherProjects(HttpContext http)
     {
         try
@@ -628,7 +701,15 @@ public class StudentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Entrega arquivos do projeto (6 arquivos esperados) e salva anexos.
+    /// </summary>
+    /// <param name="http">HttpContext com form-data contendo os arquivos.</param>
+    /// <returns>Mensagem e lista de arquivos salvos.</returns>
     [Authorize(Roles = "Student")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public static async Task<IResult> PostDeliverProject(HttpContext http)
     {
         try

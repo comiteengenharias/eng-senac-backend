@@ -3,6 +3,7 @@ using EngenhariasSenac.Database;
 using EngenhariasSenac.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using static EngenhariasSenac.Endpoints.SupportEndpoints;
 
 namespace EngenhariasSenac.Controllers;
@@ -10,7 +11,14 @@ namespace EngenhariasSenac.Controllers;
 public class SupportController : ControllerBase
 {
 
+    /// <summary>
+    /// Retorna a lista de salas disponíveis nas palestras.
+    /// </summary>
+    /// <param name="http">HttpContext do requisitante.</param>
+    /// <returns>Lista de nomes de salas.</returns>
     [Authorize(Roles = "Support")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult GetAllRooms(HttpContext http)
     {
         try
@@ -32,7 +40,16 @@ public class SupportController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Verifica se o `idSenac` informado pertence a um estudante e retorna o nome.
+    /// </summary>
+    /// <param name="http">HttpContext do requisitante.</param>
+    /// <param name="idSenac">Identificador institucional do estudante.</param>
+    /// <returns>Nome do estudante ou 404 se não encontrado.</returns>
     [Authorize(Roles = "Support")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public static IResult GetVerifyId(HttpContext http, int idSenac)
     {
         try
@@ -53,7 +70,17 @@ public class SupportController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Registra entrada/saída do estudante em uma sala de palestra.
+    /// </summary>
+    /// <param name="data">Objeto com `IdSenac`, `Room` e `Type` ('in' ou 'out').</param>
+    /// <param name="http">HttpContext do requisitante.</param>
+    /// <returns>Mensagem de sucesso ou conflito caso repetido.</returns>
     [Authorize(Roles = "Support")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public static IResult PostRegisterLog([FromBody] RegisterLogDto data, HttpContext http)
     {
         try

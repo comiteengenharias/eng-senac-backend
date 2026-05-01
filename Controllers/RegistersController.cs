@@ -3,6 +3,7 @@ using EngenhariasSenac.Database;
 using EngenhariasSenac.Helpers;
 using EngenhariasSenac.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using static EngenhariasSenac.Endpoints.RegistersEndpoints;
 
@@ -10,6 +11,14 @@ namespace EngenhariasSenac.Controllers;
 
 public class RegistersController : ControllerBase
 {
+    /// <summary>
+    /// Registra um novo líder de projeto (estudante) e cria o projeto associado.
+    /// </summary>
+    /// <param name="data">Objeto com `NewStudent` e `NewProject`.</param>
+    /// <returns>Mensagem de sucesso ou erro.</returns>
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public static IResult PostLeaderRegistration([FromBody] LeaderRegistrationDto data)
     {
         var context = new EngenhariasSenacContext();
@@ -99,6 +108,14 @@ public class RegistersController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Registra um novo membro de projeto usando token do grupo.
+    /// </summary>
+    /// <param name="data">Objeto com `NewStudent` e `Token`.</param>
+    /// <returns>Mensagem de sucesso ou erro.</returns>
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public static IResult PostMemberRegistration([FromBody] MemberRegistrationDto data)
     {
         try
@@ -162,6 +179,14 @@ public class RegistersController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Registra um novo professor (validação por token permitido) e envia e-mail de confirmação.
+    /// </summary>
+    /// <param name="data">Objeto com `NewTeacher` e `Token`.</param>
+    /// <returns>Mensagem de sucesso ou erro.</returns>
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public static IResult PostTeacherRegistration([FromBody] TeacherRegistrationDto data)
     {
         try

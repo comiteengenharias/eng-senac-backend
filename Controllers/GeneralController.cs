@@ -5,6 +5,7 @@ using EngenhariasSenac.Models;
 using EngenhariasSenac.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 namespace EngenhariasSenac.Controllers;
 
@@ -30,6 +31,13 @@ public class GeneralController : ControllerBase
         return null;
     }
 
+    /// <summary>
+    /// Retorna projetos publicados (usado no site/landing page da Semana das Engenharias).
+    /// </summary>
+    /// <param name="http">HttpContext do requisitante (não obrigatória autenticação).</param>
+    /// <returns>Lista de projetos com título, texto, imagem e paths de artigo/banner.</returns>
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult GetProjects(HttpContext http)
     {
         try

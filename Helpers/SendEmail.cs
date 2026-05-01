@@ -12,6 +12,7 @@ public class SendEmail
         var emailFrom = Environment.GetEnvironmentVariable("SMTP_FROM") ?? throw new InvalidOperationException("SMTP_FROM não definido no .env");
         var smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? throw new InvalidOperationException("SMTP_HOST não definido no .env");
         var smtpPort = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") ?? "587");
+        var smtpUsername = Environment.GetEnvironmentVariable("SMTP_USERNAME") ?? emailFrom;
         var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? throw new InvalidOperationException("SMTP_PASSWORD não definido no .env");
         try
         {
@@ -19,7 +20,7 @@ public class SendEmail
             smtpClient.EnableSsl = true;
             smtpClient.Timeout = 60000;
             smtpClient.UseDefaultCredentials = false;
-            smtpClient.Credentials = new NetworkCredential(emailFrom, smtpPassword);
+            smtpClient.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
             emailMessage.From = new MailAddress(emailFrom, "Comitê das Engenharias Senac");
             emailMessage.Body = body;
             emailMessage.Subject = subject;

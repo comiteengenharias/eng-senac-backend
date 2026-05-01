@@ -5,6 +5,7 @@ using EngenhariasSenac.Models;
 using EngenhariasSenac.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 namespace EngenhariasSenac.Controllers;
 
@@ -32,7 +33,14 @@ public class TeacherController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna os dados do professor autenticado.
+    /// </summary>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Objeto com informações do professor.</returns>
     [Authorize(Roles = "Teacher")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult GetMyTeacherData(HttpContext http)
     {
         try
@@ -52,7 +60,16 @@ public class TeacherController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Altera a senha do professor autenticado.
+    /// </summary>
+    /// <param name="data">Objeto com `CurrentPsw` e `NewPsw`.</param>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Mensagem de sucesso ou erro.</returns>
     [Authorize(Roles = "Teacher")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public static IResult PostChangePassword([FromBody] ChangePasswordDto data, HttpContext http)
     {
         try
@@ -82,8 +99,16 @@ public class TeacherController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna a lista de projetos disponíveis para avaliação pelo professor.
+    /// </summary>
+    /// <param name="filterDto">Filtro opcional por semestre e nome do grupo.</param>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Lista de projetos com informações resumidas.</returns>
     [Authorize(Roles = "Teacher")]
     [HttpPost("/api/teacher/projects")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult GetProjectsData([FromBody] ProjectsFilterDto? filterDto, HttpContext http)
     {
         try
@@ -142,7 +167,16 @@ public class TeacherController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Envia avaliação de projeto feita pelo professor (nota final e comentário).
+    /// </summary>
+    /// <param name="data">Objeto com `ProjectId`, `Assessment`, `Comment` e `EvaluateType`.</param>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Mensagem de sucesso ou erro.</returns>
     [Authorize(Roles = "Teacher")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public static IResult PostEvaluateProjects([FromBody] ProjectsNotesDto data, HttpContext http)
     {
         try
@@ -185,8 +219,16 @@ public class TeacherController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna os melhores projetos do semestre informado.
+    /// </summary>
+    /// <param name="filterDto">Filtro opcional por semestre e nome do grupo.</param>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Lista ordenada dos melhores projetos.</returns>
     [Authorize(Roles = "Teacher")]
     [HttpPost("/api/teacher/top-projects-ranking")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult GetTopProjectsBySemester([FromBody] ProjectsFilterDto? filterDto, HttpContext http)
     {
         try
@@ -330,8 +372,16 @@ public class TeacherController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna as notas finais dos projetos conforme filtros informados.
+    /// </summary>
+    /// <param name="filterDto">Filtros: semestre, curso, fullname e pontoMaterial.</param>
+    /// <param name="http">HttpContext com token de autenticação.</param>
+    /// <returns>Lista com notas finais dos projetos.</returns>
     [Authorize(Roles = "Teacher")]
     [HttpPost("/api/teacher/final-notes")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public static IResult GetFinalNotes([FromBody] FinalNotesFilterDto? filterDto, HttpContext http)
     {
         try
