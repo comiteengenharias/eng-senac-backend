@@ -1,4 +1,4 @@
-# Etapa 1: build da aplicação
+# Etapa 1: build da aplicaÃ§Ã£o
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
@@ -8,16 +8,11 @@ RUN dotnet restore
 COPY . ./
 RUN dotnet publish -c Release -o /app/publish
 
-# (Opcional) copie seu .env, se usar
-COPY .env /app/publish/
-
-# Etapa 2: imagem de runtime
+# Etapa 2: runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
-ARG PORT=8080
-ENV ASPNETCORE_URLS="https://+:${PORT}"
-EXPOSE ${PORT}
+ENV ASPNETCORE_URLS=http://+:$PORT
 
 COPY --from=build /app/publish .
 
