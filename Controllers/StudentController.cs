@@ -134,7 +134,7 @@ public class StudentController : ControllerBase
                 else
                 {
                     // Verificar data limite para mensagem customizada
-                    var dateLimitStr = "2025-12-06";
+                    var dateLimitStr = "2026-06-14";
                     var dateLimit = DateTime.ParseExact(dateLimitStr, "yyyy-MM-dd", null);
                     var today = DateTime.Now;
 
