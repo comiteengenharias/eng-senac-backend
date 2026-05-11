@@ -68,6 +68,7 @@ public class StudentController : ControllerBase
             {
                 extraNote = 1.0;
                 extraNoteReason = "Líder de Comitê";
+                student.PointMaterial = "Todas as disciplinas";
             }
             else if (committeeParticipants.Contains(idSenac))
             {
