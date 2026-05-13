@@ -14,5 +14,14 @@ public static class RoboticaLoginEndpoints
 
         app.MapPost("/api/robotica/register", RoboticaLoginController.PostRegister)
             .AllowAnonymous();
+
+        app.MapPost("/api/robotica/register/admin", RoboticaLoginController.PostAdminRegister)
+            .AllowAnonymous();
+
+        app.MapPost("/api/robotica/register/juiz", RoboticaLoginController.PostJuizRegister)
+            .AllowAnonymous();
+
+        app.MapPost("/api/robotica/register/tecnico", RoboticaLoginController.PostTecnicoRegister)
+            .AllowAnonymous();
     }
 }

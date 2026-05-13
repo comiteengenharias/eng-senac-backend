@@ -181,4 +181,223 @@ public class RoboticaLoginController
             return Results.Problem("Erro ao criar conta: " + ex.Message);
         }
     }
+
+    /// <summary>
+    /// Registra uma nova conta de ADMIN com validação de token administrativo.
+    /// </summary>
+    /// <param name="data">Dados do admin: nome, CPF, email institucional, código de autorização e senha.</param>
+    /// <returns>Informação da criação da conta ou erro.</returns>
+    [HttpPost("/api/robotica/register/admin")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public static IResult PostAdminRegister([FromBody] AdminRegisterDto data)
+    {
+        try
+        {
+            // Valida token administrativo
+            var expectedToken = Environment.GetEnvironmentVariable("ADM_ADMIN_TOKEN");
+            if (string.IsNullOrEmpty(expectedToken) || data.AdminToken != expectedToken)
+                return Results.Json(new { message = "Token administrativo inválido" }, statusCode: StatusCodes.Status401Unauthorized);
+
+            var context = new EngenhariasSenacContext();
+            var dalAuth = new DAL<Auth>(context);
+            var dalUser = new DAL<User>(context);
+
+            // Verifica se email já existe
+            var existingAuth = dalAuth.SelectWhere(a => a.Email == data.EmailInstitucional);
+            if (existingAuth != null)
+                return Results.Conflict(new { message = "Email já cadastrado" });
+
+            // Valida dados obrigatórios
+            if (string.IsNullOrWhiteSpace(data.NomeCompleto) || string.IsNullOrWhiteSpace(data.Cpf) ||
+                string.IsNullOrWhiteSpace(data.EmailInstitucional) || string.IsNullOrWhiteSpace(data.Senha) ||
+                string.IsNullOrWhiteSpace(data.CodigoAutorizacao))
+                return Results.BadRequest(new { message = "Todos os campos são obrigatórios" });
+
+            // Cria registro de autenticação
+            var passwordHash = PasswordHasher.HashPassword(data.Senha);
+            var auth = new Auth
+            {
+                Id = Guid.NewGuid(),
+                Email = data.EmailInstitucional,
+                PasswordHash = passwordHash,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            dalAuth.Insert(auth);
+
+            // Cria registro de usuário ADMIN
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                AuthId = auth.Id,
+                Email = data.EmailInstitucional,
+                Name = data.NomeCompleto,
+                Cpf = data.Cpf,
+                TypeUser = "Admin",
+                CodAutorizacao = Guid.TryParse(data.CodigoAutorizacao, out var guid) ? guid : null,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            dalUser.Insert(user);
+
+            return Results.Created("/api/robotica/me", new
+            {
+                message = "Administrador registrado com sucesso",
+                userId = user.Id
+            });
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Erro ao registrar administrador: " + ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Registra uma nova conta de JUIZ com validação de token administrativo.
+    /// </summary>
+    /// <param name="data">Dados do juiz: nome, CPF, email institucional, código de autorização e senha.</param>
+    /// <returns>Informação da criação da conta ou erro.</returns>
+    [HttpPost("/api/robotica/register/juiz")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public static IResult PostJuizRegister([FromBody] JuizRegisterDto data)
+    {
+        try
+        {
+            // Valida token administrativo
+            var expectedToken = Environment.GetEnvironmentVariable("JUIZ_ADMIN_TOKEN");
+            if (string.IsNullOrEmpty(expectedToken) || data.AdminToken != expectedToken)
+                return Results.Json(new { message = "Token administrativo inválido" }, statusCode: StatusCodes.Status401Unauthorized);
+
+            var context = new EngenhariasSenacContext();
+            var dalAuth = new DAL<Auth>(context);
+            var dalUser = new DAL<User>(context);
+
+            // Verifica se email já existe
+            var existingAuth = dalAuth.SelectWhere(a => a.Email == data.EmailInstitucional);
+            if (existingAuth != null)
+                return Results.Conflict(new { message = "Email já cadastrado" });
+
+            // Valida dados obrigatórios
+            if (string.IsNullOrWhiteSpace(data.NomeCompleto) || string.IsNullOrWhiteSpace(data.Cpf) ||
+                string.IsNullOrWhiteSpace(data.EmailInstitucional) || string.IsNullOrWhiteSpace(data.Senha) ||
+                string.IsNullOrWhiteSpace(data.CodigoAutorizacao))
+                return Results.BadRequest(new { message = "Todos os campos são obrigatórios" });
+
+            // Cria registro de autenticação
+            var passwordHash = PasswordHasher.HashPassword(data.Senha);
+            var auth = new Auth
+            {
+                Id = Guid.NewGuid(),
+                Email = data.EmailInstitucional,
+                PasswordHash = passwordHash,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            dalAuth.Insert(auth);
+
+            // Cria registro de usuário JUIZ
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                AuthId = auth.Id,
+                Email = data.EmailInstitucional,
+                Name = data.NomeCompleto,
+                Cpf = data.Cpf,
+                TypeUser = "Juiz",
+                CodAutorizacao = Guid.TryParse(data.CodigoAutorizacao, out var guid) ? guid : null,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            dalUser.Insert(user);
+
+            return Results.Created("/api/robotica/me", new
+            {
+                message = "Juiz registrado com sucesso",
+                userId = user.Id
+            });
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Erro ao registrar juiz: " + ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Registra uma nova conta de TECNICO.
+    /// </summary>
+    /// <param name="data">Dados do técnico: nome, CPF, email, instituição de ensino e senha.</param>
+    /// <returns>Informação da criação da conta ou erro.</returns>
+    [HttpPost("/api/robotica/register/tecnico")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public static IResult PostTecnicoRegister([FromBody] TecnicoRegisterDto data)
+    {
+        try
+        {
+            var context = new EngenhariasSenacContext();
+            var dalAuth = new DAL<Auth>(context);
+            var dalUser = new DAL<User>(context);
+
+            // Verifica se email já existe
+            var existingAuth = dalAuth.SelectWhere(a => a.Email == data.Email);
+            if (existingAuth != null)
+                return Results.Conflict(new { message = "Email já cadastrado" });
+
+            // Valida dados obrigatórios
+            if (string.IsNullOrWhiteSpace(data.Nome) || string.IsNullOrWhiteSpace(data.Cpf) ||
+                string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Senha) ||
+                string.IsNullOrWhiteSpace(data.InstituicaoEnsino))
+                return Results.BadRequest(new { message = "Todos os campos são obrigatórios" });
+
+            // Cria registro de autenticação
+            var passwordHash = PasswordHasher.HashPassword(data.Senha);
+            var auth = new Auth
+            {
+                Id = Guid.NewGuid(),
+                Email = data.Email,
+                PasswordHash = passwordHash,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            dalAuth.Insert(auth);
+
+            // Cria registro de usuário TECNICO
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                AuthId = auth.Id,
+                Email = data.Email,
+                Name = data.Nome,
+                Cpf = data.Cpf,
+                TypeUser = "Tecnico",
+                InstituicaoEnsino = data.InstituicaoEnsino,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            dalUser.Insert(user);
+
+            return Results.Created("/api/robotica/me", new
+            {
+                message = "Técnico registrado com sucesso",
+                userId = user.Id
+            });
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Erro ao registrar técnico: " + ex.Message);
+        }
+    }
 }

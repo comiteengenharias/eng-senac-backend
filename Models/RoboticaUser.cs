@@ -30,7 +30,10 @@ public class User
     public string Email { get; set; } = null!;
 
     [MaxLength(50)]
-    public string TypeUser { get; set; } = null!; // "Admin", "Professor", "Aluno"
+    public string TypeUser { get; set; } = null!; // "Admin", "Juiz", "Tecnico", "Professor", "Aluno"
+
+    [MaxLength(100)]
+    public string? InstituicaoEnsino { get; set; } // Para técnicos
 
     public Auth Auth { get; set; } = null!;
 }
