@@ -71,7 +71,7 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(allowedOrigins)
             .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-            .WithHeaders("Content-Type", "Authorization")
+            .AllowAnyHeader()  
             .AllowCredentials()
     );
 });
@@ -101,12 +101,14 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedProto
 });
 
+app.UseRouting();
 app.UseCors("CorsWithCredentials");
 app.UseStaticFiles();
 
 // middleware de autenticação e autorização
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseHttpsRedirection();
 
 // endpoints
 app.AddRegistersEndpoints();
