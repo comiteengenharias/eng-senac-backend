@@ -12,8 +12,6 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
-ENV ASPNETCORE_URLS=http://+:$PORT
-
 COPY --from=build /app/publish .
 
-ENTRYPOINT ["dotnet", "EngenhariasSenac.dll"]
+ENTRYPOINT ["sh", "-c", "dotnet EngenhariasSenac.dll --urls http://+:${PORT:-8080}"]
