@@ -57,14 +57,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+var allowedOrigins = new[]
+{
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://engenhariasenac.com.br",
+    "https://www.engenhariasenac.com.br"
+};
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsWithCredentials", policy =>
         policy
-            // aceita qualquer origem, mesmo com credenciais
-            .SetIsOriginAllowed(_ => true)
-            .AllowAnyHeader()
-            .AllowAnyMethod()
+            .WithOrigins(allowedOrigins)
+            .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+            .WithHeaders("Content-Type", "Authorization")
             .AllowCredentials()
     );
 });
