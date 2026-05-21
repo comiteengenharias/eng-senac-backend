@@ -57,13 +57,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-var allowedOrigins = new[]
-{
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://engenhariasenac.com.br",
-    "https://www.engenhariasenac.com.br"
-};
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+    ?? Array.Empty<string>();
 
 builder.Services.AddCors(options =>
 {
@@ -71,7 +66,7 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(allowedOrigins)
             .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-            .AllowAnyHeader()  
+            .AllowAnyHeader()
             .AllowCredentials()
     );
 });
@@ -101,6 +96,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedProto
 });
 
+app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("CorsWithCredentials");
 app.UseStaticFiles();
@@ -108,7 +104,6 @@ app.UseStaticFiles();
 // middleware de autenticação e autorização
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
 
 // endpoints
 app.AddRegistersEndpoints();
