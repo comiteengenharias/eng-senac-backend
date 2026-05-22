@@ -1,43 +1,43 @@
-﻿using System.Net;
-using System.Net.Mail;
-using System.Net.NetworkInformation;
+﻿using System.Text;
+using System.Text.Json;
 
 namespace EngenhariasSenac.Helpers;
 
 public class SendEmail
 {
+    private static readonly HttpClient _httpClient = new();
+
     public static void Send(string personalEmail, string institucionalEmail, string subject, string body)
     {
-        MailMessage emailMessage = new MailMessage();
-        var emailFrom = Environment.GetEnvironmentVariable("SMTP_FROM") ?? throw new InvalidOperationException("SMTP_FROM não definido no .env");
-        var smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? throw new InvalidOperationException("SMTP_HOST não definido no .env");
-        var smtpPort = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") ?? "587");
-        var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? throw new InvalidOperationException("SMTP_PASSWORD não definido no .env");
-        try
+        var apiKey = Environment.GetEnvironmentVariable("BREVO_API_KEY")
+            ?? throw new InvalidOperationException("BREVO_API_KEY não definido no .env");
+        var emailFrom = Environment.GetEnvironmentVariable("SMTP_FROM")
+            ?? throw new InvalidOperationException("SMTP_FROM não definido no .env");
+
+        var recipients = new List<object> { new { email = institucionalEmail } };
+        if (!string.IsNullOrWhiteSpace(personalEmail) && personalEmail != institucionalEmail)
         {
-            var smtpClient = new SmtpClient(smtpHost, smtpPort);
-            smtpClient.EnableSsl = true;
-            smtpClient.Timeout = 60000;
-            smtpClient.UseDefaultCredentials = false;
-            smtpClient.Credentials = new NetworkCredential(emailFrom, smtpPassword);
-            emailMessage.From = new MailAddress(emailFrom, "Comitê das Engenharias Senac");
-            emailMessage.Body = body;
-            emailMessage.Subject = subject;
-            emailMessage.IsBodyHtml = true;
-            emailMessage.Priority = MailPriority.Normal;
-            emailMessage.To.Add(institucionalEmail);
-
-            if (!string.IsNullOrWhiteSpace(personalEmail) && personalEmail != institucionalEmail)
-            {
-                emailMessage.To.Add(personalEmail);
-            }
-
-            smtpClient.Send(emailMessage);
-
+            recipients.Add(new { email = personalEmail });
         }
-        catch (Exception ex)
+
+        var payload = new
         {
-            Console.WriteLine(ex.Message);
+            sender = new { name = "Comitê das Engenharias Senac", email = emailFrom },
+            to = recipients,
+            subject,
+            htmlContent = body
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.brevo.com/v3/smtp/email");
+        request.Headers.Add("api-key", apiKey);
+        request.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+        var response = _httpClient.Send(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            throw new Exception($"Brevo API error {(int)response.StatusCode}: {error}");
         }
     }
 }
