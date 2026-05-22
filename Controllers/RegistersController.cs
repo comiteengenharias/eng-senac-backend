@@ -131,6 +131,12 @@ public class RegistersController : ControllerBase
             var verifyToken = dalProject.SelectWhere(a => a.Token == data.Token);
             if (verifyToken is not null)
             {
+                // verifica se o semestre do aluno condiz com o semestre da equipe
+                if (verifyToken.Semester != data.NewStudent.Semester)
+                {
+                    return Results.Conflict("O semestre selecionado não condiz com o semestre da equipe");
+                }
+
                 // define FK ProjectTeam em Students
                 data.NewStudent.ProjectTeam = verifyToken.CodTeam;
             }
