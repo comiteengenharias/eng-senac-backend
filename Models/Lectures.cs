@@ -26,4 +26,6 @@ public class Lecture
 
     [MaxLength(255)]
     public string Picture { get; set; } = null!;
+
+    public bool Checked { get; set; } = false;
 }
