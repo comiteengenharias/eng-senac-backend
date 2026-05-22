@@ -56,25 +56,35 @@ public class StudentController : ControllerBase
                 .Where(c => c.Role == "Leader")
                 .Select(c => c.IdSenac)
                 .ToList();
-            
+
             var committeeParticipants = context.Committee
                 .Where(c => c.Role == "Member")
                 .Select(c => c.IdSenac)
                 .ToList();
+
+            var repParticipants = context.Committee
+            .Where(c => c.Role == "Rep")
+            .Select(c => c.IdSenac)
+            .ToList();
 
             int idSenac = student.IdSenac ?? 0;
 
             if (committeeLeaders.Contains(idSenac))
             {
                 extraNote = 1.0;
-                extraNoteReason = "Líder de Comitê";
-                student.PointMaterial = "Todas as disciplinas";
+                extraNoteReason = "Líder do Comitê";
+                student.PointMaterial = "todas as disciplinas";
             }
             else if (committeeParticipants.Contains(idSenac))
             {
                 extraNote = 1.0;
-                extraNoteReason = "Participante de Comitê";
+                extraNoteReason = "Membro do Comitê";
             }
+            else if (repParticipants.Contains(idSenac))
+            {
+                extraNote = 1.0;
+                extraNoteReason = "Representante de turma";
+            } 
             else
             {
                 // Calcular presença em palestras
@@ -519,7 +529,7 @@ public class StudentController : ControllerBase
             var context = new EngenhariasSenacContext();
             var dalProject = new DAL<ProjectTeam>(context);
             var projects = dalProject.SelectWhereList(
-                a => (!filterDto.Semester.HasValue || a.Semester == filterDto.Semester.Value) 
+                a => (!filterDto.Semester.HasValue || a.Semester == filterDto.Semester.Value)
                     && a.CodTeam != student.ProjectTeam
                     && (string.IsNullOrEmpty(filterDto.GroupName) || a.GroupName.ToLower().Contains(filterDto.GroupName.ToLower())),
                 q => q.OrderBy(p => p.Semester).ThenBy(p => p.GroupName)

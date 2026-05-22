@@ -260,7 +260,7 @@ public class TeacherController : ControllerBase
                     decimal studentSum = studentCount > 0
                         ? projectStudentAssessments.Sum(a => (decimal)a.Assessment)
                         : 0m;
-                    int studentDivisor = studentCount < 3 ? 3 : studentCount;
+                    int studentDivisor = studentCount < 5 ? 5 : studentCount;
                     decimal studentAvg = studentCount > 0
                         ? Math.Round(studentSum / studentDivisor, 2)
                         : 0m;
@@ -305,7 +305,7 @@ public class TeacherController : ControllerBase
                     {
                         banca = new
                         {
-                            count = $"{p.BancaCount}/2",
+                            count = $"{p.BancaCount}/3",
                             average = p.BancaAverage
                         },
                         feira = new
@@ -315,7 +315,7 @@ public class TeacherController : ControllerBase
                         },
                         student = new
                         {
-                            count = $"{p.StudentCount}/3",
+                            count = $"{p.StudentCount}/5",
                             average = p.StudentAverage
                         }
                     }
