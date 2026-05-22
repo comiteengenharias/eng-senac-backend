@@ -23,14 +23,14 @@ public class RegistersController : ControllerBase
             var verifyIdSenac = dalStudent.SelectWhere(a => a.IdSenac == data.NewStudent.IdSenac);
             if (verifyIdSenac is not null)
             {
-                return Results.Conflict("ID do Senac já cadastrado");
+                return Results.Conflict("Estamos com um problema para validar seu cadastro. Por favor, entre em contato com o suporte.");
             }
 
             // verifica duplicidade do e-mail
             var verifyEmail = dalStudent.SelectWhere(a => a.InstitutionalEmail == data.NewStudent.InstitutionalEmail);
             if (verifyEmail is not null)
             {
-                return Results.Conflict("E-mail já cadastrado");
+                return Results.Conflict("Estamos com um problema para validar seu cadastro. Por favor, entre em contato com o suporte.");
             }
             else if (!data.NewStudent.InstitutionalEmail.Contains("@senacsp.edu.br"))
             {
@@ -113,18 +113,18 @@ public class RegistersController : ControllerBase
             var verifyIdSenac = dalStudent.SelectWhere(a => a.IdSenac == data.NewStudent.IdSenac);
             if (verifyIdSenac is not null)
             {
-                return Results.Conflict("ID do Senac já cadastrado");
+                return Results.Conflict("Estamos com um problema para validar seu cadastro. Por favor, entre em contato com o suporte.");
             }
 
             // verifica duplicidade do e-mail
             var verifyEmail = dalStudent.SelectWhere(a => a.InstitutionalEmail == data.NewStudent.InstitutionalEmail);
             if (verifyEmail is not null)
             {
-                return Results.Conflict("E-mail já cadastrado");
+                return Results.Conflict("Estamos com um problema para validar seu cadastro. Por favor, entre em contato com o suporte.");
             }
             else if (!data.NewStudent.InstitutionalEmail.Contains("@senacsp.edu.br"))
             {
-                return Results.Conflict("O e-mail institucional precisa conter @senacsp.edu.br");
+                return Results.Conflict("Insira um e-mail institucional válido");
             }
 
             // verifica token do grupo
@@ -196,11 +196,11 @@ public class RegistersController : ControllerBase
             var verifyEmail = dalTeacher.SelectWhere(a => a.InstitutionalEmail == data.NewTeacher.InstitutionalEmail);
             if (verifyEmail is not null)
             {
-                return Results.Conflict("E-mail já cadastrado");
+                return Results.Conflict("Estamos com um problema para validar seu cadastro. Por favor, entre em contato com o suporte.");
             }
             else if (!data.NewTeacher.InstitutionalEmail.Contains("senac"))
             {
-                return Results.Conflict("O e-mail institucional precisa conter o domínio do senac");
+                return Results.Conflict("Insira um e-mail institucional válido");
             }
 
             // Verifica se o token está na lista de tokens permitidos
