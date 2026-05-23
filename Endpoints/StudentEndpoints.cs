@@ -35,5 +35,8 @@ public static class StudentEndpoints
         app.MapPost("/api/student/deliver-project", (Delegate)StudentController.PostDeliverProject)
             .RequireAuthorization();
 
+        app.MapPatch("/api/student/point-material", StudentController.PatchPointMaterial)
+            .RequireAuthorization();
+
     }
 }
