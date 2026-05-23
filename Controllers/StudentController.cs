@@ -73,7 +73,7 @@ public class StudentController : ControllerBase
             {
                 extraNote = 1.0;
                 extraNoteReason = "Líder do Comitê";
-                student.PointMaterial = "todas as disciplinas";
+                student.PointMaterial = "Todas as disciplinas";
             }
             else if (committeeParticipants.Contains(idSenac))
             {
@@ -200,6 +200,30 @@ public class StudentController : ControllerBase
         catch (Exception ex)
         {
             return Results.Problem("Erro ao alterar senha: " + ex.Message);
+        }
+    }
+
+    [HttpPatch("/api/student/point-material")]
+    public static IResult PatchPointMaterial([FromBody] ChangePointMaterialDto data, HttpContext http)
+    {
+        try
+        {
+            var student = GetAuthenticatedStudent(http);
+            if (student == null)
+                return Results.NotFound("Estudante não encontrado");
+
+            var context = new EngenhariasSenacContext();
+            var dalStudent = new DAL<Student>(context);
+
+            student.PointMaterial = data.PointMaterial;
+
+            dalStudent.Update(student);
+
+            return Results.Ok("Material de ponto alterado com sucesso");
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Erro ao alterar material de ponto: " + ex.Message);
         }
     }
 
