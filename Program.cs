@@ -64,7 +64,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsWithCredentials", policy =>
         policy
-            .WithOrigins(allowedOrigins)
+            .SetIsOriginAllowed(_ => true)
             .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             .AllowAnyHeader()
             .AllowCredentials()
