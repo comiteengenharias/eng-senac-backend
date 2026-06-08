@@ -211,7 +211,8 @@ public class RegistersController : ControllerBase
                 "1143252886",
                 "1140012459",
                 "1140138230",
-                "1142977906"
+                "1142977906",
+                "1143406749"
             };
 
             var teacherAdminToken = Environment.GetEnvironmentVariable("TEACHER_ADMIN_TOKEN");
