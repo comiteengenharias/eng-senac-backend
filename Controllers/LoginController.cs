@@ -159,7 +159,7 @@ public class LoginController : ControllerBase
     }
 
     [HttpPost("/api/recover-password/teacher")]
-    public static IResult RecoverTeacherPassword([FromBody] string institutionalEmail)
+    public static IResult RecoverTeacherPassword([FromBody] RecoverPasswordDto dto)
     {
         try
         {
@@ -167,7 +167,7 @@ public class LoginController : ControllerBase
             var dalTeacher = new DAL<Teacher>(context);
 
             // Verifica se o e-mail existe
-            var teacher = dalTeacher.SelectWhere(t => t.InstitutionalEmail == institutionalEmail);
+            var teacher = dalTeacher.SelectWhere(t => t.InstitutionalEmail == dto.InstitutionalEmail);
             if (teacher == null)
                 return Results.NotFound("E-mail não cadastrado");
 
@@ -195,7 +195,7 @@ public class LoginController : ControllerBase
     }
 
     [HttpPost("/api/recover-password/student")]
-    public static IResult RecoverStudentPassword([FromBody] string institutionalEmail)
+    public static IResult RecoverStudentPassword([FromBody] RecoverPasswordDto dto)
     {
         try
         {
@@ -203,7 +203,7 @@ public class LoginController : ControllerBase
             var dalStudent = new DAL<Student>(context);
 
             // Verifica se o e-mail existe
-            var student = dalStudent.SelectWhere(s => s.InstitutionalEmail == institutionalEmail);
+            var student = dalStudent.SelectWhere(s => s.InstitutionalEmail == dto.InstitutionalEmail);
             if (student == null)
                 return Results.NotFound("E-mail não cadastrado");
 

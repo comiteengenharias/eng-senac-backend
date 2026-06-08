@@ -20,6 +20,11 @@ public static class LoginEndpoints
         public string Password { get; set; } = null!;
     }
 
+    public class RecoverPasswordDto
+    {
+        public string InstitutionalEmail { get; set; } = null!;
+    }
+
     public static void AddLoginEndpoints(this WebApplication app)
     {
 
