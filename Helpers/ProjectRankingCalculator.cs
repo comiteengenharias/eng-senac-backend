@@ -21,7 +21,7 @@ public static class ProjectRankingCalculator
     /// <summary>
     /// Quantidades mínimas de avaliações por categoria
     /// </summary>
-    private const int MIN_BANCA_REVIEWS = 3;
+    private const int MIN_BANCA_REVIEWS = 2;
     private const int MIN_FEIRA_REVIEWS = 3;
     private const int MIN_STUDENT_REVIEWS = 5;
 
