@@ -5,4 +5,5 @@ public class ProjectsAssessmentDto
     public int ProjectId { get; set; }
     public decimal Assessment { get; set; }
     public string Comment { get; set; } = null!;
+    public string ImageUrl { get; set; } = null!;
 }
