@@ -745,5 +745,61 @@ public class StudentController : ControllerBase
         }
     }
 
+    [HttpPost("/api/student/platform-issue")]
+    public static IResult PostPlatformIssue([FromBody] PlatformIssueDto data, HttpContext http)
+    {
+        try
+        {
+            var context = new EngenhariasSenacContext();
+            var dalStudent = new DAL<Student>(context);
+            var student = dalStudent.SelectWhere(s => s.CodStudents == data.StudentId);
+
+            if (student == null)
+                return Results.NotFound("Estudante não encontrado");
+
+            var dalIssue = new DAL<PlatformIssue>(context);
+
+            var recentIssue = dalIssue.SelectWhere(i =>
+                i.StudentId == data.StudentId &&
+                i.SentAt >= DateTime.UtcNow.AddHours(-24));
+
+            if (recentIssue != null)
+                return Results.Conflict("Você já enviou uma solicitação nas últimas 24 horas. Aguarde antes de enviar uma nova.");
+
+            var issue = new PlatformIssue
+            {
+                StudentId = data.StudentId,
+                Title = data.Title,
+                Description = data.Description,
+                SentAt = data.SentAt,
+                ImageUrl1 = string.IsNullOrWhiteSpace(data.ImageUrl1) ? null : data.ImageUrl1,
+                ImageUrl2 = string.IsNullOrWhiteSpace(data.ImageUrl2) ? null : data.ImageUrl2,
+                Checked = false,
+                ResolutionComment = null
+            };
+
+            dalIssue.Insert(issue);
+
+            var emailBody = "<h1>Solicitação recebida!</h1>" +
+                "<p>Olá, <strong>" + student.Fullname + "</strong>!</p>" +
+                "<p>Recebemos seu relato sobre um problema na plataforma. Aqui estão os detalhes registrados:</p>" +
+                "<p><strong>Título:</strong> " + issue.Title + "</p>" +
+                "<p><strong>Descrição:</strong> " + issue.Description + "</p>" +
+                "<p>Retornaremos via e-mail em até 2 dias úteis</p>";
+
+            SendEmail.Send(
+                student.PersonalEmail ?? string.Empty,
+                student.InstitutionalEmail,
+                "Recebemos sua solicitação",
+                emailBody);
+
+            return Results.Created("", new { message = "Retornaremos via e-mail em até 2 dias úteis." });
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Erro ao registrar solicitação: " + ex.Message);
+        }
+    }
+
 
 }
