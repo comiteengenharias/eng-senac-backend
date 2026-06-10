@@ -38,5 +38,8 @@ public static class StudentEndpoints
         app.MapPatch("/api/student/point-material", StudentController.PatchPointMaterial)
             .RequireAuthorization();
 
+        app.MapPost("/api/student/platform-issue", StudentController.PostPlatformIssue)
+            .RequireAuthorization();
+
     }
 }

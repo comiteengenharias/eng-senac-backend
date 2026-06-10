@@ -11,6 +11,11 @@ public static class SupportEndpoints
         public int IdSenac { get; set; }
     }
 
+    public class CloseIssueDto
+    {
+        public string? ResolutionComment { get; set; }
+    }
+
 
     public static void AddSupportEndpoints(this WebApplication app)
     {
@@ -21,6 +26,12 @@ public static class SupportEndpoints
             .RequireAuthorization();
 
         app.MapPost("/api/support/register-log", SupportController.PostRegisterLog)
+            .RequireAuthorization();
+
+        app.MapGet("/api/support/platform-issues", SupportController.GetAllPlatformIssues)
+            .RequireAuthorization();
+
+        app.MapPatch("/api/support/platform-issues/{codIssue}/close", SupportController.PatchCloseIssue)
             .RequireAuthorization();
 
     }

@@ -1,5 +1,6 @@
 ﻿using EngenhariasSenac.Banco;
 using EngenhariasSenac.Database;
+using EngenhariasSenac.Helpers;
 using EngenhariasSenac.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -106,6 +107,107 @@ public class SupportController : ControllerBase
         catch (Exception ex)
         {
             return Results.Problem("Erro ao alterar senha: " + ex.Message);
+        }
+    }
+
+    [Authorize(Roles = "Support")]
+    public static IResult GetAllPlatformIssues(HttpContext http, bool? onlyUnsolved)
+    {
+        try
+        {
+            var context = new EngenhariasSenacContext();
+
+            var query = context.PlatformIssues
+                .Join(context.Students,
+                    issue => issue.StudentId,
+                    student => student.CodStudents,
+                    (issue, student) => new { issue, student });
+
+            if (onlyUnsolved == true)
+                query = query.Where(x => !x.issue.Checked);
+
+            var result = query
+                .OrderByDescending(x => x.issue.SentAt)
+                .Select(x => new
+                {
+                    student = new
+                    {
+                        x.student.CodStudents,
+                        x.student.IdSenac,
+                        x.student.InstitutionalEmail,
+                        x.student.PersonalEmail,
+                        x.student.Cellphone,
+                        x.student.Semester
+                    },
+                    issue = new
+                    {
+                        x.issue.CodIssue,
+                        x.issue.Title,
+                        x.issue.Description,
+                        x.issue.SentAt,
+                        x.issue.ImageUrl1,
+                        x.issue.ImageUrl2,
+                        x.issue.Checked,
+                        x.issue.ResolutionComment
+                    }
+                })
+                .ToList();
+
+            return Results.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Erro ao buscar solicitações: " + ex.Message);
+        }
+    }
+
+    [Authorize(Roles = "Support")]
+    public static IResult PatchCloseIssue(HttpContext http, int codIssue, [FromBody] CloseIssueDto data)
+    {
+        try
+        {
+            var context = new EngenhariasSenacContext();
+            var dalIssue = new DAL<PlatformIssue>(context);
+
+            var issue = dalIssue.SelectWhere(i => i.CodIssue == codIssue);
+            if (issue == null)
+                return Results.NotFound("Solicitação não encontrada");
+
+            issue.Checked = true;
+            issue.ResolutionComment = string.IsNullOrWhiteSpace(data.ResolutionComment) ? null : data.ResolutionComment;
+
+            dalIssue.Update(issue);
+
+            var dalStudent = new DAL<Student>(context);
+            var student = dalStudent.SelectWhere(s => s.CodStudents == issue.StudentId);
+
+            if (student != null)
+            {
+                var commentSection = string.IsNullOrWhiteSpace(issue.ResolutionComment)
+                    ? "<p>Nenhum comentário adicional foi registrado.</p>"
+                    : "<br><p><strong>A resolução do seu problema foi esta:</strong></p><blockquote style=\"border-left: 4px solid #ccc; margin: 0; padding: 8px 16px; color: #555;\">" + issue.ResolutionComment + "</blockquote><br>";
+
+                var emailBody = "<h1>Sua solicitação foi resolvida!</h1>" +
+                    "<p>Olá, <strong>" + student.Fullname + "</strong>!</p>" +
+                    "<p>O chamado que você abriu na plataforma foi encerrado. Veja os detalhes abaixo:</p>" +
+                    "<p><strong>Título:</strong> " + issue.Title + "</p>" +
+                    "<p><strong>Descrição:</strong> " + issue.Description + "</p>" +
+                    commentSection +
+                    "<p>Qualquer dúvida estamos à disposição!</p>" +
+                    "<p>Comitê das Engenharias Senac</p>";
+
+                SendEmail.Send(
+                    student.PersonalEmail ?? string.Empty,
+                    student.InstitutionalEmail,
+                    "Sua solicitação foi resolvida",
+                    emailBody);
+            }
+
+            return Results.Ok("Solicitação encerrada com sucesso");
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Erro ao encerrar solicitação: " + ex.Message);
         }
     }
 }
