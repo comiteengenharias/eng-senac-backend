@@ -478,15 +478,10 @@ public class StudentController : ControllerBase
             if (student == null)
                 return Results.NotFound("Estudante não encontrado");
 
-            var form = await http.Request.ReadFormAsync();
+            var dto = await http.Request.ReadFromJsonAsync<BusinessAssessmentDto>();
 
-            // Monta o DTO manualmente
-            var dto = new BusinessAssessmentDto
-            {
-                CompanyId = int.TryParse(form["companyId"], out var cId) ? cId : 0,
-                Assessment = int.TryParse(form["assessment"], out var nota) ? nota : -1,
-                Comment = form["comment"].ToString()
-            };
+            if (dto == null)
+                return Results.BadRequest("Corpo da requisição inválido");
 
             if (dto.CompanyId <= 0)
                 return Results.BadRequest("Código da empresa inválido");
@@ -494,27 +489,8 @@ public class StudentController : ControllerBase
             if (dto.Assessment < 0 || dto.Assessment > 10)
                 return Results.BadRequest("Nota deve estar entre 0 e 10");
 
-            var file = form.Files.FirstOrDefault();
-            if (file == null || file.Length == 0)
-                return Results.BadRequest("Imagem obrigatória");
-
-            var extension = Path.GetExtension(file.FileName).ToLower();
-            if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
-                return Results.BadRequest("Formato de imagem inválido. Use JPG ou PNG.");
-
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var folderPath = Path.Combine("wwwroot", "public", "Storage", "12st_week", "business_assessments");
-
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-
-            var fullPath = Path.Combine(folderPath, fileName);
-            using (var stream = new FileStream(fullPath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            var relativePath = Path.Combine("Storage", "12st_week", "business_assessments", fileName).Replace("\\", "/");
+            if (string.IsNullOrWhiteSpace(dto.ImageUrl))
+                return Results.BadRequest("URL da imagem obrigatória");
 
             var context = new EngenhariasSenacContext();
             var dal = new DAL<BusinessAssessment>(context);
@@ -524,7 +500,7 @@ public class StudentController : ControllerBase
                 StudentEvaluator = student.CodStudents,
                 CompanyEvaluated = dto.CompanyId,
                 Assessment = dto.Assessment,
-                Picture = relativePath,
+                Picture = dto.ImageUrl,
                 Comment = dto.Comment
             };
 
@@ -600,16 +576,11 @@ public class StudentController : ControllerBase
             if (student == null)
                 return Results.NotFound("Estudante não encontrado");
 
-            var form = await http.Request.ReadFormAsync();
+            var dto = await http.Request.ReadFromJsonAsync<ProjectsAssessmentDto>();
             var context = new EngenhariasSenacContext();
 
-            // Monta o DTO manualmente
-            var dto = new ProjectsAssessmentDto
-            {
-                ProjectId = int.TryParse(form["projectId"], out var cId) ? cId : 0,
-                Assessment = int.TryParse(form["assessment"], out var nota) ? nota : -1,
-                Comment = form["comment"].ToString()
-            };
+            if (dto == null)
+                return Results.BadRequest("Corpo da requisição inválido");
 
             var dalProject = new DAL<ProjectTeam>(context);
             var project = dalProject.SelectWhere(a => a.CodTeam == dto.ProjectId);
@@ -620,38 +591,19 @@ public class StudentController : ControllerBase
             if (dto.Assessment < 0 || dto.Assessment > 10)
                 return Results.BadRequest("Nota deve estar entre 0 e 10");
 
-            var file = form.Files.FirstOrDefault();
-            if (file == null || file.Length == 0)
-                return Results.BadRequest("Imagem obrigatória");
-
-            var extension = Path.GetExtension(file.FileName).ToLower();
-            if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
-                return Results.BadRequest("Formato de imagem inválido. Use JPG ou PNG.");
-
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var folderPath = Path.Combine("wwwroot", "public", "Storage", "12st_week", "projects_assessments");
-
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-
-            var fullPath = Path.Combine(folderPath, fileName);
-            using (var stream = new FileStream(fullPath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            var relativePath = Path.Combine("Storage", "12st_week", "projects_assessments", fileName).Replace("\\", "/");
+            if (string.IsNullOrWhiteSpace(dto.ImageUrl))
+                return Results.BadRequest("URL da imagem obrigatória");
 
             var dalProjAssessment = new DAL<ProjectAssessment>(context);
 
-            var newAssessment = (new ProjectAssessment
+            var newAssessment = new ProjectAssessment
             {
                 StudentEvaluator = student.CodStudents,
                 EvaluatedProject = dto.ProjectId,
                 Assessment = dto.Assessment,
-                Picture = relativePath,
+                Picture = dto.ImageUrl,
                 Comment = dto.Comment
-            });
+            };
 
             dalProjAssessment.Insert(newAssessment);
 
