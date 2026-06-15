@@ -30,6 +30,81 @@ public class GeneralController : ControllerBase
         return null;
     }
 
+    public static IResult GetAllCompanies()
+    {
+        try
+        {
+            var context = new EngenhariasSenacContext();
+
+            var companies = context.Companies
+                .OrderBy(c => c.Name)
+                .Select(c => new
+                {
+                    codCompany = c.CodCompany,
+                    name = c.Name,
+                    description = c.Description,
+                    picture = c.Picture
+                })
+                .ToList();
+
+            return Results.Ok(companies);
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Erro ao buscar empresas: " + ex.Message);
+        }
+    }
+
+    public static IResult GetCompanyAssessments(int codCompany)
+    {
+        try
+        {
+            var context = new EngenhariasSenacContext();
+
+            var company = context.Companies.FirstOrDefault(c => c.CodCompany == codCompany);
+            if (company == null)
+                return Results.NotFound("Empresa não encontrada");
+
+            var assessments = context.BusinessAssessment
+                .Where(a => a.CompanyEvaluated == codCompany)
+                .ToList();
+
+            var studentIds = assessments.Select(a => a.StudentEvaluator).Distinct().ToList();
+
+            var students = context.Students
+                .Where(s => studentIds.Contains(s.CodStudents))
+                .ToList();
+
+            var result = assessments.Select(a =>
+            {
+                var student = students.FirstOrDefault(s => s.CodStudents == a.StudentEvaluator);
+                return new
+                {
+                    assessment = a.Assessment,
+                    picture = a.Picture,
+                    comment = a.Comment,
+                    evaluator = student == null ? null : (object)new
+                    {
+                        fullname = student.Fullname,
+                        course = student.Course,
+                        semester = student.Semester
+                    }
+                };
+            }).ToList();
+
+            return Results.Ok(new
+            {
+                companyName = company.Name,
+                totalAssessments = assessments.Count,
+                data = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Erro ao buscar avaliações da empresa: " + ex.Message);
+        }
+    }
+
     public static IResult GetProjects(HttpContext http)
     {
         try
